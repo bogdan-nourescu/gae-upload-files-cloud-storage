@@ -1,10 +1,13 @@
-package ro.cbn.it.gae2.upload;
+package ro.cbn.it.goae2.utils;
 
 import com.google.appengine.tools.cloudstorage.*;
 import com.google.apphosting.api.ApiProxy;
+import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 
@@ -57,6 +60,22 @@ public class GcsUtils {
             }
             reader.close();
             return builder.toString();
+    }
+
+    /**
+     * Read the file from cloud storage to a specified OutputStream<br />
+     * Does not close the OutputStream<br />
+     * It uses a buffer of 1MB
+     * @param gcsFilename the file to be read
+     * @param out The output stream where the contents of the file are written
+     * @throws IOException
+     */
+    public static void readFile(GcsFilename gcsFilename, OutputStream out) throws IOException {
+        GcsService gcsService = GcsServiceFactory.createGcsService();
+        GcsInputChannel readChannel = gcsService.openPrefetchingReadChannel(gcsFilename, 0, 1024 * 1024);
+        InputStream in = Channels.newInputStream(readChannel);
+        IOUtils.copy(in, out);
+        in.close();
     }
 
     public static boolean deleteFile(String fileName) throws IOException {

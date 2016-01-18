@@ -2,6 +2,7 @@ package ro.cbn.it.gae2.upload;
 
 import com.google.appengine.tools.cloudstorage.*;
 import org.apache.commons.io.IOUtils;
+import ro.cbn.it.goae2.utils.GcsUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
