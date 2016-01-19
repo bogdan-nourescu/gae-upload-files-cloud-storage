@@ -5,10 +5,10 @@
     <title>Sample Upload File</title>
 </head>
 <body>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="text" name="description" />
-        <input type="file" name="file" />
-        <input type="submit" />
+    <form action="/upload_cloud_storage" method="post" enctype="multipart/form-data">
+        <div><label for="description"></label><input id="description" type="text" name="description" /></div>
+        <div><label for="file"></label><input type="file" name="file" id="file"/></div>
+        <div><input type="submit" /></div>
     </form>
 </body>
 </html>

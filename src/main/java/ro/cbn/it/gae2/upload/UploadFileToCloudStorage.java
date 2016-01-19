@@ -1,8 +1,8 @@
 package ro.cbn.it.gae2.upload;
 
-import com.google.appengine.tools.cloudstorage.GcsService;
-import com.google.appengine.tools.cloudstorage.GcsServiceFactory;
-import com.google.appengine.tools.cloudstorage.RetryParams;
+import com.google.appengine.tools.cloudstorage.*;
+import org.apache.commons.io.IOUtils;
+import ro.cbn.it.goae2.utils.GcsUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -13,12 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.Channels;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet("/upload")
+@WebServlet("/upload_cloud_storage")
 @MultipartConfig
-public class UploadFile extends HttpServlet{
+public class UploadFileToCloudStorage extends HttpServlet{
     private final GcsService gcsService = GcsServiceFactory.createGcsService(RetryParams.getDefaultInstance());
 
     @Override
@@ -37,9 +38,27 @@ public class UploadFile extends HttpServlet{
 
         Part filePart = request.getPart("file"); // Retrieves <input type="file" name="file">
         String fileName = filePart.getSubmittedFileName();
+        String contentType = filePart.getContentType();
+        if (contentType == null || contentType.isEmpty()) {
+            contentType = "application/octet-stream";
+        }
         logger.log(Level.CONFIG,"file: "+fileName);
 
         InputStream fileContent = filePart.getInputStream();
         //do what you need with fileContent
+        GcsFileOptions fileOptions = new GcsFileOptions.Builder()
+                .mimeType(contentType)
+                .contentEncoding("UTF-8")
+                .build();
+        GcsOutputChannel outputChannel = gcsService.createOrReplace(getFileName(fileName), fileOptions);
+        IOUtils.copy(fileContent, Channels.newOutputStream(outputChannel));
+        fileContent.close();
+        outputChannel.close();
+    }
+
+    private GcsFilename getFileName(String fileName){
+        //the recommandation is to create an unique filename.
+        //one way to do this is to create an Entity that contains the file meta and use the id/hash to uniquely identify the file
+        return GcsUtils.getGcsFileName(fileName);
     }
 }
