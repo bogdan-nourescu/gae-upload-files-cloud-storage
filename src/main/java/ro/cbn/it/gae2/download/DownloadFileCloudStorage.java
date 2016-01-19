@@ -4,7 +4,6 @@ import ro.cbn.it.goae2.utils.GcsUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +12,6 @@ import java.io.IOException;
 import java.util.Date;
 
 @WebServlet("/download_cloud_storage")
-@MultipartConfig
 public class DownloadFileCloudStorage extends HttpServlet{
 
     @Override
